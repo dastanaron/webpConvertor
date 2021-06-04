@@ -16,4 +16,4 @@ make compile
 Dependencies:
 --------------------------
 
-Based on (go-webpbin)[https://github.com/nickalie/go-webpbin]
+Based on [go-webpbin](https://github.com/nickalie/go-webpbin)
