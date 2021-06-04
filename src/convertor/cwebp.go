@@ -114,9 +114,5 @@ func (wp *WebP) Run() error {
 
 	err = cmd.Wait()
 
-	//wp.output.Write(out)
-
-	fmt.Printf("%s\n", args)
-
 	return err
 }

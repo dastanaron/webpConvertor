@@ -8,7 +8,7 @@ USER root
 
 RUN apk add --update --no-cache libc6-compat libpng-dev libjpeg-turbo-dev giflib-dev tiff-dev autoconf automake make gcc g++ wget
 
-RUN mkdir -p /var/www/html/webpconvertor
+RUN mkdir -p /var/www/html/webpconvertor/data
 
 #Installing webp lib
 RUN wget https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-0.6.0.tar.gz && \
@@ -20,6 +20,8 @@ cd /libwebp && \
 make && \
 make install && \
 rm -rf libwebp
+
+COPY ./data/config.docker.yaml /var/www/html/webpconvertor/data/config.yaml
 
 RUN set -eux; \
 	addgroup -g ${GID} -S ${USER}; \
@@ -38,4 +40,4 @@ USER ${UID}:${GID}
 
 WORKDIR /var/www/html/webpconvertor
 
-CMD ["/var/www/html/webpconvertor/run", ">", "/dev/stderr"]
+CMD ["/var/www/html/webpconvertor/run", "-c", "/var/www/html/webpconvertor/data/config.yaml", ">", "/dev/stderr"]
