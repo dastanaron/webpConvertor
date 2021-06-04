@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  webp:
+    restart: "no"
+    build:
+      context: ./
+      dockerfile: Dockerfile
+  nginx:
+    restart: always
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"

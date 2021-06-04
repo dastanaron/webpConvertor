@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	webpbin.SkipDownload()
 	http.HandleFunc("/", handleRequest)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
