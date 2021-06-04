@@ -31,6 +31,6 @@ clean:
 	go clean
 	rm -f build/${APP_NAME}
 	rm -f build/${APP_NAME}_x86
-	rm -f build/${APP_NAME}_x64
+	rm -f build/${APP_NAME}
 	rm -f build/${APP_NAME}_x86.exe
-	rm -f build/${APP_NAME}_x64.exe
+	rm -f build/${APP_NAME}
