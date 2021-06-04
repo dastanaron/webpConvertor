@@ -2,37 +2,85 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
-	"github.com/nickalie/go-webpbin"
+	"github.com/dastanaron/webpConvertor/convertor"
+	"github.com/dastanaron/webpConvertor/helpers"
 )
 
+var appConfig helpers.AppConfig
+
 func main() {
-	webpbin.SkipDownload()
+	appConfig = helpers.InitAppParams()
 	http.HandleFunc("/", handleRequest)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", appConfig.Port), nil))
 }
 
 func handleRequest(response http.ResponseWriter, request *http.Request) {
 	downloadedImage, err := downloadImage(request)
 	if err != nil {
-		BuildErrorResponse(err, response, 422)
+		helpers.BuildErrorResponse(err, response, 422)
 		return
 	}
 	convert(response, request, downloadedImage)
 }
 
 func convert(response http.ResponseWriter, request *http.Request, image *bytes.Buffer) {
-	err := webpbin.NewCWebP().
-		Quality(80).
-		Input(image).
-		Output(response).
-		Run()
-	CheckError(err)
+	params := request.URL.Query()
+
+	cwebp := convertor.NewCWebP()
+	cwebp.SetBinPath(appConfig.WebpLibPath).Input(image).Output(response)
+
+	qualityParam, ok := params["q"]
+
+	var err error
+
+	if ok {
+		quality, err := strconv.ParseInt(qualityParam[0], 10, 64)
+
+		if err == nil {
+			cwebp.SetQuality(int(quality))
+		}
+	}
+
+	resizeParamWidth, ok := params["w"]
+
+	var width, heigth int64
+
+	if ok {
+		width, err = strconv.ParseInt(resizeParamWidth[0], 10, 64)
+
+		if err != nil {
+			helpers.BuildErrorResponse(errors.New("[w] parameter is not string"), response, 422)
+			return
+		}
+	}
+
+	resizeParamHeight, ok := params["h"]
+
+	if ok {
+		heigth, err = strconv.ParseInt(resizeParamHeight[0], 10, 64)
+
+		if err != nil {
+			helpers.BuildErrorResponse(errors.New("[h] parameter is not string"), response, 422)
+			return
+		}
+	}
+
+	if width > 0 && heigth > 0 {
+		cwebp.SetResize(int(width), int(heigth))
+	}
+
+	err = cwebp.Run()
+
+	if err != nil {
+		helpers.BuildErrorResponse(err, response, 500)
+	}
 }
 
 func downloadImage(request *http.Request) (*bytes.Buffer, error) {
@@ -67,34 +115,4 @@ func downloadImage(request *http.Request) (*bytes.Buffer, error) {
 	}
 
 	return &downloadedFile, nil
-}
-
-func CheckError(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func BuildErrorResponse(err error, response http.ResponseWriter, statusCode int) {
-	errorStructure := ErrorResponse{"error", err.Error()}
-
-	json, err := json.Marshal(errorStructure)
-	if err != nil {
-		http.Error(response, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	response.Header().Set("Content-Type", "application/json")
-	response.WriteHeader(statusCode)
-	_, err = response.Write(json)
-
-	if err != nil {
-		http.Error(response, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-type ErrorResponse struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
 }
