@@ -29,8 +29,8 @@ compile:
 ## clear cache and remove builds
 clean:
 	go clean
-	rm -f build/${APP_NAME}
 	rm -f build/${APP_NAME}_x86
 	rm -f build/${APP_NAME}
 	rm -f build/${APP_NAME}_x86.exe
-	rm -f build/${APP_NAME}
+	rm -f build/${APP_NAME}.exe
+	rm -f build/${APP_NAME}_mac_os
