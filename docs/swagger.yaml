@@ -1,0 +1,64 @@
+openapi: 3.0.0
+info:
+  title: WebpConvertor API
+  version: '1.0'
+servers:
+  - url: /
+    description: Test server
+paths:
+  /:
+    get:
+      tags:
+        - Converting
+      parameters:
+        - name: src
+          in: query
+          schema:
+            type: string
+            description: URL to original image
+            example: https://images.pexels.com/photos/895259/pexels-photo-895259.jpeg
+        - name: q
+          in: query
+          schema:
+            type: integer
+            description: number from 1 to 100
+            example: 80
+        - name: w
+          in: query
+          schema:
+            type: integer
+            description: Width images for resizing
+            example: 500
+        - name: h
+          in: query
+          schema:
+            type: integer
+            description: Hight images for resizing
+            example: 500
+      responses:
+        '200':
+          description: Image in WebP format
+          content:
+            image/webp:
+              schema:
+                type: string
+                format: binary
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: any error description
