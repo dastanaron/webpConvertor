@@ -43,6 +43,4 @@ make compile
 Project development
 --------------------------
 
-The project will develop according to my free time and desire to develop it. If you want to stimulate my desire to develop the project, you can buy me a coffee
-
-<iframe src="https://widget.qiwi.com/widgets/big-widget-728x200?publicKey=48e7qUxn9T7RyYE1MVZswX1FRSbE6iyCj2gCRwwF3Dnh5XrasNTx3BGPiMsyXQFNKQhvukniQG8RTVhYm3iPzoNeVy7AGdQw195eDCcAAYaMCNoBWmwBNUNjUkAZ3wMx4f3vCXFnv7KzwLYc28ogtQgQh44SLXSbCMBRtPtSEg1ZPpXSMsLWf6tiNLNbz&noCache=true" width="728" height="200"allowTransparency="true" scrolling="no" frameBorder="0"></iframe>
+The project will develop according to my free time and desire to develop it. If you want to stimulate my desire to develop the project, you can buy me a coffee or [donate me](https://my.qiwi.com/Dmytryi-RPq_-kS82_)
