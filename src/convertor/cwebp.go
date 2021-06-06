@@ -10,7 +10,7 @@ type CropParameters struct {
 	x      int
 	y      int
 	width  int
-	height int
+	heigth int
 }
 
 type ResizeParameters struct {
@@ -56,12 +56,12 @@ func (wp *WebP) SetBinPath(path string) *WebP {
 	return wp
 }
 
-func (wp *WebP) SetCrop(x, y, width, height int) *WebP {
+func (wp *WebP) SetCrop(x, y, width, heigth int) *WebP {
 	wp.parameters.crop = &CropParameters{
 		x:      x,
 		y:      y,
 		width:  width,
-		height: height,
+		heigth: heigth,
 	}
 
 	return wp
@@ -88,7 +88,7 @@ func (wp *WebP) Run() error {
 	command := fmt.Sprintf("%s/cwebp", wp.binPath)
 
 	if wp.parameters.crop != nil {
-		args = append(args, "-crop", fmt.Sprintf("%d", wp.parameters.crop.x), fmt.Sprintf("%d", wp.parameters.crop.y), fmt.Sprintf("%d", wp.parameters.crop.width), fmt.Sprintf("%d", wp.parameters.crop.height))
+		args = append(args, "-crop", fmt.Sprintf("%d", wp.parameters.crop.x), fmt.Sprintf("%d", wp.parameters.crop.y), fmt.Sprintf("%d", wp.parameters.crop.width), fmt.Sprintf("%d", wp.parameters.crop.heigth))
 	}
 
 	if wp.parameters.resize != nil {
