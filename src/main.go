@@ -48,12 +48,11 @@ func convert(response http.ResponseWriter, request *http.Request, image *bytes.B
 		}
 	}
 
+	resizeParameters := convertor.ResizeParameters{}
 	resizeParamWidth, ok := params["w"]
 
-	var width, heigth int
-
 	if ok {
-		width, err = strconv.Atoi(resizeParamWidth[0])
+		resizeParameters.Width, err = strconv.Atoi(resizeParamWidth[0])
 
 		if err != nil {
 			helpers.BuildErrorResponse(errors.New("[w] parameter is not string"), response, 422)
@@ -64,7 +63,7 @@ func convert(response http.ResponseWriter, request *http.Request, image *bytes.B
 	resizeParamHeight, ok := params["h"]
 
 	if ok {
-		heigth, err = strconv.Atoi(resizeParamHeight[0])
+		resizeParameters.Height, err = strconv.Atoi(resizeParamHeight[0])
 
 		if err != nil {
 			helpers.BuildErrorResponse(errors.New("[h] parameter is not string"), response, 422)
@@ -72,8 +71,8 @@ func convert(response http.ResponseWriter, request *http.Request, image *bytes.B
 		}
 	}
 
-	if width > 0 && heigth > 0 {
-		cwebp.SetResize(width, heigth)
+	if resizeParameters.Width > 0 || resizeParameters.Height > 0 {
+		cwebp.SetResize(resizeParameters)
 	}
 
 	err = cwebp.Run()
