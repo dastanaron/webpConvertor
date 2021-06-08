@@ -35,6 +35,12 @@ paths:
             type: integer
             description: Hight images for resizing
             example: 500
+        - name: type
+          in: query
+          schema:
+            type: string
+            description: fill, fit or none. If none, will return the specified stretch size
+            example: fill
       responses:
         '200':
           description: Image in WebP format
