@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"image"
+	"image/jpeg"
+	_ "image/png"
 	"io"
 	"log"
 	"net/http"
@@ -11,6 +14,7 @@ import (
 
 	"github.com/dastanaron/webpConvertor/convertor"
 	"github.com/dastanaron/webpConvertor/helpers"
+	"github.com/disintegration/imaging"
 )
 
 var appConfig helpers.AppConfig
@@ -30,11 +34,11 @@ func handleRequest(response http.ResponseWriter, request *http.Request) {
 	convert(response, request, downloadedImage)
 }
 
-func convert(response http.ResponseWriter, request *http.Request, image *bytes.Buffer) {
+func convert(response http.ResponseWriter, request *http.Request, imageBytes *bytes.Buffer) {
 	params := request.URL.Query()
 
 	cwebp := convertor.NewCWebP()
-	cwebp.SetBinPath(appConfig.WebpLibPath).Input(image).Output(response)
+	cwebp.SetBinPath(appConfig.WebpLibPath)
 
 	qualityParam, ok := params["q"]
 
@@ -48,12 +52,11 @@ func convert(response http.ResponseWriter, request *http.Request, image *bytes.B
 		}
 	}
 
+	resizeParameters := convertor.ResizeParameters{}
 	resizeParamWidth, ok := params["w"]
 
-	var width, heigth int
-
 	if ok {
-		width, err = strconv.Atoi(resizeParamWidth[0])
+		resizeParameters.Width, err = strconv.Atoi(resizeParamWidth[0])
 
 		if err != nil {
 			helpers.BuildErrorResponse(errors.New("[w] parameter is not string"), response, 422)
@@ -64,7 +67,7 @@ func convert(response http.ResponseWriter, request *http.Request, image *bytes.B
 	resizeParamHeight, ok := params["h"]
 
 	if ok {
-		heigth, err = strconv.Atoi(resizeParamHeight[0])
+		resizeParameters.Height, err = strconv.Atoi(resizeParamHeight[0])
 
 		if err != nil {
 			helpers.BuildErrorResponse(errors.New("[h] parameter is not string"), response, 422)
@@ -72,9 +75,46 @@ func convert(response http.ResponseWriter, request *http.Request, image *bytes.B
 		}
 	}
 
-	if width > 0 && heigth > 0 {
-		cwebp.SetResize(width, heigth)
+	resizeParamType, ok := params["type"]
+
+	if ok {
+		resizeParameters.Type = resizeParamType[0]
 	}
+
+	//computedResizeParameters, cropParameters, err := computeFitCropping(resizeParameters, image)
+
+	dstImage, _, err := image.Decode(imageBytes)
+
+	if err != nil {
+		helpers.BuildErrorResponse(errors.New("Cannot decode image"), response, 422)
+		return
+	}
+
+	imageBuf := bytes.Buffer{}
+
+	var dstImageResized image.Image
+
+	if resizeParameters.Type == "fill" {
+		dstImageResized = imaging.Fill(dstImage, resizeParameters.Width, resizeParameters.Height, imaging.Center, imaging.Lanczos)
+	}
+
+	if resizeParameters.Type == "fit" {
+		dstImageResized = imaging.Fit(dstImage, resizeParameters.Width, resizeParameters.Height, imaging.Lanczos)
+	}
+
+	if resizeParameters.Type == "" {
+		dstImageResized = dstImage
+		cwebp.SetResize(resizeParameters)
+	}
+
+	err = jpeg.Encode(&imageBuf, dstImageResized, nil)
+
+	if err != nil {
+		helpers.BuildErrorResponse(errors.New("Cannot encode image"), response, 422)
+		return
+	}
+
+	cwebp.Input(&imageBuf).Output(response)
 
 	err = cwebp.Run()
 
