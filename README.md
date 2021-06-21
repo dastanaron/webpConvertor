@@ -3,6 +3,8 @@ WebpConvertor
 
 Convert image to WebP format.
 
+See [Swagger Documentation](https://app.swaggerhub.com/apis-docs/dastanaron/webpConvertor/1.0.2)
+
 How it working
 --------------------------
 
