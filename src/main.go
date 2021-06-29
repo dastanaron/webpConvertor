@@ -102,6 +102,11 @@ func convert(response http.ResponseWriter, request *http.Request, imageBytes *by
 		dstImageResized = imaging.Fit(dstImage, resizeParameters.Width, resizeParameters.Height, imaging.Lanczos)
 	}
 
+	if (resizeParameters.Type != "") && (resizeParameters.Height == 0 || resizeParameters.Width == 0) {
+		helpers.BuildErrorResponse(errors.New("You need to specify the height and width if the type is specified"), response, 409)
+		return
+	}
+
 	if resizeParameters.Type == "" {
 		dstImageResized = dstImage
 		cwebp.SetResize(resizeParameters)
@@ -122,6 +127,10 @@ func convert(response http.ResponseWriter, request *http.Request, imageBytes *by
 		helpers.BuildErrorResponse(err, response, 500)
 	}
 }
+
+/*func buildConvertParameters(response http.ResponseWriter, request *http.Request) {
+
+}*/
 
 func downloadImage(request *http.Request) (*bytes.Buffer, error) {
 	params := request.URL.Query()
