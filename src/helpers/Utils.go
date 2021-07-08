@@ -13,6 +13,7 @@ import (
 type AppConfig struct {
 	WebpLibPath string `yaml:"webpLibPath"`
 	Port        string `yaml:"port"`
+	Mode        string `yaml:"mode"`
 }
 
 func InitAppParams() AppConfig {
@@ -31,6 +32,10 @@ func InitAppParams() AppConfig {
 	err = yaml.Unmarshal(configFile, &config)
 
 	CheckError(err)
+
+	if config.Mode == "" {
+		config.Mode = "ram"
+	}
 
 	return config
 }

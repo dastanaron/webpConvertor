@@ -37,6 +37,7 @@ func handleRequest(response http.ResponseWriter, request *http.Request) {
 	}
 
 	cwebp.SetQuality(*quality)
+	cwebp.Mode(appConfig.Mode)
 
 	downloadedImage, err := downloadImage(request)
 

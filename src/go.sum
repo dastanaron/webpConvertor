@@ -1,5 +1,7 @@
 github.com/disintegration/imaging v1.6.2 h1:w1LecBlG2Lnp8B3jk5zSuNqd7b4DXhcjwek1ei82L+c=
 github.com/disintegration/imaging v1.6.2/go.mod h1:44/5580QXChDfwIclfc/PCwrr44amcmDAg8hxG0Ewe4=
+github.com/mintance/go-uniqid v0.0.0-20180517195806-49cb885aad99 h1:0Y43KD2WrnwZQcHP/E45PCEeoL9GQyWSNsUPFi6ufGU=
+github.com/mintance/go-uniqid v0.0.0-20180517195806-49cb885aad99/go.mod h1:wRmXpSqb7H927N05ZVEYBEpFGcUJz1WOcP4zrGwg/6w=
 golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8/go.mod h1:FeLwcggjj3mMvU+oOTbSwawSJRM1uh48EjtB4UJZlP0=
 golang.org/x/image v0.0.0-20210607152325-775e3b0c77b9 h1:D0iM1dTCbD5Dg1CbuvLC/v/agLc79efSj/L35Q3Vqhs=
 golang.org/x/image v0.0.0-20210607152325-775e3b0c77b9/go.mod h1:023OzeP/+EPmXeapQh35lcL3II3LrY8Ic+EFFKVhULM=
