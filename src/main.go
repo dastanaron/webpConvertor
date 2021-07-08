@@ -10,11 +10,13 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/dastanaron/webpConvertor/convertor"
 	"github.com/dastanaron/webpConvertor/helpers"
 	"github.com/disintegration/imaging"
+	"github.com/mintance/go-uniqid"
 )
 
 var appConfig helpers.AppConfig
@@ -37,6 +39,7 @@ func handleRequest(response http.ResponseWriter, request *http.Request) {
 	}
 
 	cwebp.SetQuality(*quality)
+	cwebp.Mode(appConfig.Mode)
 
 	downloadedImage, err := downloadImage(request)
 
@@ -82,12 +85,44 @@ func convert(response http.ResponseWriter, resizeParameters convertor.ResizePara
 		return
 	}
 
-	cwebp.Input(&imageBuf).Output(response)
+	if appConfig.Mode == "ram" {
+		cwebp.Input(&imageBuf).Output(response)
+	}
+
+	if appConfig.Mode == "tmp" {
+		srcFilePath := fmt.Sprintf("%s%s%s", os.TempDir(), string(os.PathSeparator), uniqid.New(uniqid.Params{Prefix: "tmp_src_", MoreEntropy: true}))
+		file, err := os.OpenFile(srcFilePath, os.O_RDWR|os.O_CREATE, 0755)
+		if err != nil {
+			helpers.BuildErrorResponse(err, response, 500)
+			return
+		}
+		_, err = file.Write(imageBuf.Bytes())
+		if err != nil {
+			helpers.BuildErrorResponse(err, response, 500)
+			return
+		}
+		file.Close()
+		cwebp.SetSrcFilePath(srcFilePath)
+	}
 
 	err = cwebp.Run()
 
 	if err != nil {
 		helpers.BuildErrorResponse(err, response, 500)
+	}
+
+	if appConfig.Mode == "tmp" {
+		tmpFile, err := os.Open(cwebp.OutputFilePath)
+		if err != nil {
+			helpers.BuildErrorResponse(err, response, 500)
+		}
+		_, err = io.Copy(response, tmpFile)
+		if err != nil {
+			helpers.BuildErrorResponse(err, response, 500)
+		}
+		tmpFile.Close()
+		os.Remove(cwebp.OutputFilePath)
+		os.Remove(cwebp.InputFilePath)
 	}
 }
 

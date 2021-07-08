@@ -21,8 +21,14 @@ Or you can simply run the program with a configuration file similar to the follo
 
 ```yaml
 webpLibPath: /usr/local/bin #You location to cwebp library
+mode: ram #or tmp
 port: 8080 #Port for listening request
 ```
+
+If you set `ram` mode, picture will be download to RAM, converted and writen to response from RAM.
+
+If you set `tmp` mode, picture will be downloaded to system temp, converted to new file, writen to response and deleted.
+This mode loads less RAM
 
 and run 
 
