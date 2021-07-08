@@ -29,11 +29,13 @@ type ConvertParams struct {
 }
 
 type WebP struct {
-	mode       string
-	input      io.Reader
-	output     io.Writer
-	binPath    string
-	parameters *ConvertParams
+	mode           string
+	input          io.Reader
+	output         io.Writer
+	InputFilePath  string
+	OutputFilePath string
+	binPath        string
+	parameters     *ConvertParams
 }
 
 func NewCWebP() *WebP {
@@ -48,6 +50,11 @@ func NewCWebP() *WebP {
 
 func (wp *WebP) Input(input io.Reader) *WebP {
 	wp.input = input
+	return wp
+}
+
+func (wp *WebP) SetSrcFilePath(path string) *WebP {
+	wp.InputFilePath = path
 	return wp
 }
 
@@ -100,16 +107,15 @@ func (wp *WebP) Run() error {
 
 	args = append(args, "-q", fmt.Sprintf("%d", wp.parameters.quality))
 
-	convertedFileName := uniqid.New(uniqid.Params{"tmp_converted_", true})
+	convertedFilePath := fmt.Sprintf("%s%s%s", os.TempDir(), string(os.PathSeparator), uniqid.New(uniqid.Params{Prefix: "tmp_src_", MoreEntropy: true}))
 
 	if wp.mode == "ram" {
 		args = append(args, "-o", "-")
-
 		args = append(args, "--", "-")
 	} else {
-		args = append(args, "-o", fmt.Sprintf("%s%s%s", os.TempDir(), string(os.PathSeparator), convertedFileName))
-
-		args = append(args, "--", "-")
+		args = append(args, "-o", convertedFilePath)
+		args = append(args, wp.InputFilePath)
+		wp.OutputFilePath = convertedFilePath
 	}
 
 	cmd := exec.Command(command, args...)
